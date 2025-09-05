@@ -2,17 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { auth } = require('../middleware/auth');
 const {
-  validateUserPreferences,
-  validatePagination
-} = require('../middleware/validation');
-const {
   getUserStats,
-  getUserAttempts,
+  getSolvedProblems, 
   updatePreferences
-} = require('../controllers/userController');
+} = require('../controllers/statsContoller');
 
 router.get('/stats', auth, getUserStats);
-router.get('/attempts', auth, validatePagination, getUserAttempts);
-router.put('/preferences', auth, validateUserPreferences, updatePreferences);
+router.get('/solved', auth, getSolvedProblems); 
+// router.put('/preferences', auth, updatePreferences);
 
 module.exports = router;

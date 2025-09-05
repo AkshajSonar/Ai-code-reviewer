@@ -37,8 +37,8 @@ export const authAPI = {
 };
 
 export const codeforcesAPI = {
-  getProblems: (tags) => api.get(`/api/codeforces/problems?tags=${tags}`),
-  getRandomProblem: (tags) => api.get(`/api/codeforces/problems/random?tags=${tags}`),
+  getProblems: (tags, rating) => api.get(`/api/codeforces/problems?tags=${tags}&rating=${rating || ''}`),
+  getRandomProblem: (tags, rating) => api.get(`/api/codeforces/problems/random?tags=${tags}&rating=${rating || ''}`),
   saveAttempt: (data) => api.post('/api/codeforces/attempt', data),
   bookmarkProblem: (data) => api.post('/api/codeforces/bookmark', data),
   getBookmarks: () => api.get('/api/codeforces/bookmarks'),
@@ -51,7 +51,7 @@ export const geminiAPI = {
 
 export const userAPI = {
   getStats: () => api.get('/api/users/stats'),
-  getAttempts: (params) => api.get('/api/users/attempts', { params }),
+  getSolvedProblems: (params) => api.get('/api/users/solved', { params }),
   updatePreferences: (data) => api.put('/api/users/preferences', data),
 };
 
