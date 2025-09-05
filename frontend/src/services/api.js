@@ -42,6 +42,7 @@ export const codeforcesAPI = {
   saveAttempt: (data) => api.post('/api/codeforces/attempt', data),
   bookmarkProblem: (data) => api.post('/api/codeforces/bookmark', data),
   getBookmarks: () => api.get('/api/codeforces/bookmarks'),
+  removeBookmark: (contestId, problemIndex) => api.delete(`/api/codeforces/bookmark/${contestId}/${problemIndex}`),
 };
 
 export const geminiAPI = {
@@ -52,6 +53,10 @@ export const geminiAPI = {
 export const userAPI = {
   getStats: () => api.get('/api/users/stats'),
   getSolvedProblems: (params) => api.get('/api/users/solved', { params }),
+  getProblemAttempt: (contestId, problemIndex) => api.get(`/api/users/attempt/${contestId}/${problemIndex}`),
+  getUserCode: (contestId, problemIndex) => api.get(`/api/users/code/${contestId}/${problemIndex}`),
+  getAIReview: (contestId, problemIndex) => api.get(`/api/users/review/${contestId}/${problemIndex}`),
+  getChartData: () => api.get('/api/users/chart-data'),
   updatePreferences: (data) => api.put('/api/users/preferences', data),
 };
 

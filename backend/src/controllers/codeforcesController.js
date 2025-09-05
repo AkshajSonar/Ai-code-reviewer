@@ -41,7 +41,7 @@ exports.saveProblemAttempt = async (req, res) => {
       problemName,
       problemTags,
       problemRating,
-      solved, // This might be undefined or null
+      solved,
       timeTaken,
       code,
       language,
@@ -50,11 +50,6 @@ exports.saveProblemAttempt = async (req, res) => {
 
     // Generate problemId from contestId and problemIndex
     const problemId = `${contestId}${problemIndex}`;
-
-    // Ensure solved is always a boolean
-    const isSolved = Boolean(solved);
-    
-    console.log('Saving attempt - solved:', solved, 'converted to:', isSolved);
 
     // Check if attempt already exists
     const existingAttempt = await ProblemAttempt.findOne({
@@ -67,13 +62,14 @@ exports.saveProblemAttempt = async (req, res) => {
 
     if (existingAttempt) {
       // Update existing attempt
-      existingAttempt.solved = isSolved; // Use the converted boolean
+      existingAttempt.solved = solved;
       existingAttempt.timeTaken = timeTaken;
       existingAttempt.code = code;
       existingAttempt.language = language;
       existingAttempt.reviewFeedback = reviewFeedback;
       existingAttempt.problemRating = problemRating;
       existingAttempt.problemTags = problemTags;
+      existingAttempt.attemptDate = new Date();
       attempt = await existingAttempt.save();
     } else {
       // Create new attempt
@@ -85,7 +81,7 @@ exports.saveProblemAttempt = async (req, res) => {
         problemName,
         problemTags,
         problemRating,
-        solved: isSolved, // Use the converted boolean
+        solved: solved || false, // Ensure boolean value
         timeTaken,
         code,
         language,
@@ -94,8 +90,6 @@ exports.saveProblemAttempt = async (req, res) => {
       await attempt.save();
     }
 
-    console.log('Attempt saved successfully. Solved:', attempt.solved);
-    
     res.json({ 
       success: true,
       attempt 

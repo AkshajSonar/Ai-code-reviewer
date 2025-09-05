@@ -24,7 +24,7 @@ const ProblemAttemptSchema = new mongoose.Schema({
   },
   problemTags: {
     type: [String],
-    required: true
+    default: []
   },
   problemRating: {
     type: Number,
@@ -51,12 +51,16 @@ const ProblemAttemptSchema = new mongoose.Schema({
     required: true
   },
   reviewFeedback: {
-    type: String
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true
 });
 
+// Index for efficient querying
 ProblemAttemptSchema.index({ user: 1, contestId: 1, problemIndex: 1 }, { unique: true });
+ProblemAttemptSchema.index({ user: 1, solved: 1 });
+ProblemAttemptSchema.index({ user: 1, problemRating: 1 });
 
 module.exports = mongoose.model('ProblemAttempt', ProblemAttemptSchema);

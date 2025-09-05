@@ -13,7 +13,6 @@ const ProblemSolve = () => {
   const [userCode, setUserCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [timeTaken, setTimeTaken] = useState(0);
-  const [problemRating, setProblemRating] = useState(1500);
   const [solved, setSolved] = useState(false);
   const [language, setLanguage] = useState('python');
   const [submitting, setSubmitting] = useState(false);
@@ -22,6 +21,7 @@ const ProblemSolve = () => {
   const [showBookmarkOptions, setShowBookmarkOptions] = useState(false);
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
+  const pausedTimeRef = useRef(0);
   const user = getUser();
 
   useEffect(() => {
@@ -42,7 +42,6 @@ const ProblemSolve = () => {
             tags: tags ? tags.split(',') : ['algorithm', 'coding'],
             rating: parseInt(rating) || 1500
           });
-          setProblemRating(parseInt(rating) || 1500);
         } catch (error) {
           console.error('Failed to fetch problem:', error);
         }
@@ -62,7 +61,7 @@ const ProblemSolve = () => {
 
   const startTimer = () => {
     if (!isTimerRunning) {
-      startTimeRef.current = Date.now();
+      startTimeRef.current = Date.now() - pausedTimeRef.current;
       setIsTimerRunning(true);
       
       timerRef.current = setInterval(() => {
@@ -76,9 +75,17 @@ const ProblemSolve = () => {
     if (isTimerRunning && timerRef.current) {
       clearInterval(timerRef.current);
       setIsTimerRunning(false);
-      const finalTime = Math.floor((Date.now() - startTimeRef.current) / 1000);
-      setTimeTaken(finalTime);
+      pausedTimeRef.current = timeTaken * 1000;
     }
+  };
+
+  const resetTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    setTimeTaken(0);
+    pausedTimeRef.current = 0;
+    setIsTimerRunning(false);
   };
 
   const formatTime = (seconds) => {
@@ -98,35 +105,45 @@ const ProblemSolve = () => {
   };
 
   const saveProblemAttempt = async (code, reviewFeedback = '') => {
-  if (!problem) return;
+    if (!problem) return;
 
-  setSubmitting(true);
-  try {
-    const response = await codeforcesAPI.saveAttempt({
-      contestId: problem.contestId,
-      problemIndex: problem.index,
-      problemName: problem.name,
-      problemTags: problem.tags,
-      problemRating: problemRating,
-      solved: solved,
-      timeTaken: timeTaken,
-      code: code,
-      language: language,
-      reviewFeedback: reviewFeedback
-    });
-    
-    if (response.data.success) {
-      setSavedAttempt(response.data.attempt);
-      setShowBookmarkOptions(true);
-      return true;
+    setSubmitting(true);
+    try {
+      const response = await codeforcesAPI.saveAttempt({
+        contestId: problem.contestId,
+        problemIndex: problem.index,
+        problemName: problem.name,
+        problemTags: problem.tags,
+        problemRating: problem.rating,
+        solved: solved,
+        timeTaken: timeTaken,
+        code: code,
+        language: language,
+        reviewFeedback: reviewFeedback
+      });
+      
+      if (response.data.success) {
+        setSavedAttempt(response.data.attempt);
+        setShowBookmarkOptions(true);
+      }
+    } catch (error) {
+      console.error('Failed to save attempt:', error);
     }
-  } catch (error) {
-    console.error('Failed to save attempt:', error);
-    alert('Failed to save your attempt. Please try again.');
-  }
-  setSubmitting(false);
-  return false;
-};
+    setSubmitting(false);
+  };
+
+  const handleSubmitToCodeforces = () => {
+    if (problem && userCode) {
+      // Open Codeforces submit page in new tab
+      const submitUrl = `https://codeforces.com/problemset/submit`;
+      window.open(submitUrl, '_blank');
+      
+      // You could also try to auto-fill form data (though this is limited by browser security)
+      alert(`Submit your code on Codeforces for problem ${problem.contestId}${problem.index}`);
+    } else {
+      alert('Please write some code first');
+    }
+  };
 
   const handleBookmark = async () => {
     try {
@@ -135,12 +152,11 @@ const ProblemSolve = () => {
         problemIndex: problem.index,
         problemName: problem.name,
         problemTags: problem.tags,
-        problemRating: problemRating
+        problemRating: problem.rating
       });
       alert('Problem bookmarked successfully!');
     } catch (error) {
       console.error('Failed to bookmark:', error);
-      alert('Failed to bookmark problem.');
     }
   };
 
@@ -159,13 +175,8 @@ const ProblemSolve = () => {
     setUserCode('');
     setSavedAttempt(null);
     setShowBookmarkOptions(false);
-    window.location.href = '/';
-  };
-
-  const openCodeforces = () => {
-    if (problem) {
-      window.open(`https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}`, '_blank');
-    }
+    resetTimer();
+    startTimer();
   };
 
   if (loading) {
@@ -193,13 +204,16 @@ const ProblemSolve = () => {
           <div className="timer-controls">
             {isTimerRunning ? (
               <button onClick={stopTimer} className="btn btn-secondary">
-                ⏹️ Stop Timer
+                ⏸️ Pause Timer
               </button>
             ) : (
               <button onClick={startTimer} className="btn btn-primary">
-                ▶️ Start Timer
+                ▶️ Resume Timer
               </button>
             )}
+            <button onClick={resetTimer} className="btn btn-secondary">
+              🔄 Reset Timer
+            </button>
           </div>
         </div>
       </div>
@@ -210,85 +224,58 @@ const ProblemSolve = () => {
           
           {/* Problem Actions */}
           <div className="problem-actions">
-            <button onClick={openCodeforces} className="btn btn-secondary">
-              📖 View on Codeforces
-            </button>
+            {problem && (
+              <a
+                href={`https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+              >
+                📖 View Problem
+              </a>
+            )}
             
+            <button 
+              onClick={handleSubmitToCodeforces}
+              className="btn btn-primary"
+              disabled={!userCode}
+            >
+              🚀 Submit to Codeforces
+            </button>
+
             {showBookmarkOptions && (
-              <button onClick={handleBookmark} className="btn btn-primary">
+              <button onClick={handleBookmark} className="btn btn-secondary">
                 ⭐ Bookmark Problem
               </button>
             )}
           </div>
 
-          {/* Solution Metadata Form */}
-          <div className="solution-meta">
-            <h3>Solution Details</h3>
-            <div className="meta-form">
-              <div className="form-group">
-                <label>Time Taken:</label>
-                <div className="time-display">
-                  {formatTime(timeTaken)}
-                </div>
-              </div>
-              
-              <div className="form-group">
-                <label>Problem Rating:</label>
-                <div className="rating-display">
-                  {problemRating}
-                </div>
-              </div>
-              
-              <div className="form-group">
-                <label>Problem Tags:</label>
-                <div className="tags-display">
-                  {problem?.tags.map(tag => (
-                    <span key={tag} className="tag">{tag}</span>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="form-group checkbox-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={solved}
-                    onChange={(e) => setSolved(e.target.checked)}
-                  />
-                  I solved this problem
-                </label>
-              </div>
+          {/* Language Selection */}
+          <div className="language-selection">
+            <h4>Programming Language:</h4>
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="language-select"
+            >
+              <option value="python">Python</option>
+              <option value="cpp">C++</option>
+              <option value="java">Java</option>
+              <option value="javascript">JavaScript</option>
+              <option value="c">C</option>
+            </select>
+          </div>
 
-              <div className="form-group">
-                <label>Programming Language:</label>
-                <select
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value)}
-                >
-                  <option value="python">Python</option>
-                  <option value="javascript">JavaScript</option>
-                  <option value="java">Java</option>
-                  <option value="cpp">C++</option>
-                  <option value="c">C</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="meta-actions">
-              <button 
-                onClick={handleSaveWithoutReview}
-                disabled={submitting || !userCode}
-                className="btn btn-primary"
-              >
-                {submitting ? 'Saving...' : '💾 Save Solution'}
-              </button>
-              
-              {savedAttempt && (
-                <div className="save-success">
-                  ✅ Solution saved successfully! ({new Date(savedAttempt.attemptDate).toLocaleTimeString()})
-                </div>
-              )}
-            </div>
+          {/* Solved Checkbox */}
+          <div className="solved-checkbox">
+            <label>
+              <input
+                type="checkbox"
+                checked={solved}
+                onChange={(e) => setSolved(e.target.checked)}
+              />
+              I solved this problem
+            </label>
           </div>
         </div>
 

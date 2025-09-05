@@ -7,7 +7,9 @@ const SolvedProblems = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalSolved, setTotalSolved] = useState(0);
-  const [error, setError] = useState(null);
+  const [selectedProblem, setSelectedProblem] = useState(null);
+  const [showCode, setShowCode] = useState(false);
+  const [showReview, setShowReview] = useState(false);
   const problemsPerPage = 10;
 
   useEffect(() => {
@@ -16,22 +18,16 @@ const SolvedProblems = () => {
 
   const fetchSolvedProblems = async () => {
     try {
-      console.log('Fetching solved problems...');
-      setLoading(true);
       const response = await userAPI.getSolvedProblems({
         page: currentPage,
         limit: problemsPerPage
       });
       
-      console.log('API Response:', response.data);
-      
       setSolvedProblems(response.data.solvedProblems || []);
       setTotalPages(response.data.totalPages || 1);
       setTotalSolved(response.data.totalSolved || 0);
-      setError(null);
     } catch (error) {
       console.error('Failed to fetch solved problems:', error);
-      setError(error.response?.data?.error || error.message);
       setSolvedProblems([]);
     }
     setLoading(false);
@@ -44,20 +40,26 @@ const SolvedProblems = () => {
     return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
   };
 
+  const viewCode = (problem) => {
+    setSelectedProblem(problem);
+    setShowCode(true);
+    setShowReview(false);
+  };
+
+  const viewReview = (problem) => {
+    setSelectedProblem(problem);
+    setShowReview(true);
+    setShowCode(false);
+  };
+
+  const closeModal = () => {
+    setShowCode(false);
+    setShowReview(false);
+    setSelectedProblem(null);
+  };
+
   if (loading) {
     return <div className="loading">Loading solved problems...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="error">
-        <h3>Error Loading Solved Problems</h3>
-        <p>{error}</p>
-        <button onClick={fetchSolvedProblems} className="btn btn-primary">
-          Try Again
-        </button>
-      </div>
-    );
   }
 
   return (
@@ -111,10 +113,17 @@ const SolvedProblems = () => {
                     View Problem
                   </a>
                   <button
-                    onClick={() => window.location.href = `/solve?contestId=${problem.contestId}&index=${problem.problemIndex}&problem=${encodeURIComponent(problem.problemName)}&rating=${problem.problemRating}&tags=${problem.problemTags ? problem.problemTags.join(',') : ''}`}
+                    onClick={() => viewCode(problem)}
                     className="btn btn-primary"
                   >
-                    Solve Again
+                    View My Code
+                  </button>
+                  <button
+                    onClick={() => viewReview(problem)}
+                    className="btn btn-secondary"
+                    disabled={!problem.reviewFeedback}
+                  >
+                    View AI Review
                   </button>
                 </div>
               </div>
@@ -142,6 +151,44 @@ const SolvedProblems = () => {
               >
                 Next
               </button>
+            </div>
+          )}
+
+          {/* Code Modal */}
+          {showCode && selectedProblem && (
+            <div className="modal-overlay" onClick={closeModal}>
+              <div className="modal-content" onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h3>Your Code: {selectedProblem.problemName}</h3>
+                  <button onClick={closeModal} className="modal-close">×</button>
+                </div>
+                <div className="code-display">
+                  <pre>{selectedProblem.code}</pre>
+                </div>
+                <div className="modal-footer">
+                  <button onClick={closeModal} className="btn btn-primary">Close</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Review Modal */}
+          {showReview && selectedProblem && (
+            <div className="modal-overlay" onClick={closeModal}>
+              <div className="modal-content" onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h3>AI Review: {selectedProblem.problemName}</h3>
+                  <button onClick={closeModal} className="modal-close">×</button>
+                </div>
+                <div className="review-display">
+                  <div className="review-text">
+                    {selectedProblem.reviewFeedback}
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button onClick={closeModal} className="btn btn-primary">Close</button>
+                </div>
+              </div>
             </div>
           )}
         </>
