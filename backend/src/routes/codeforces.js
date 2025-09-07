@@ -1,20 +1,21 @@
-const express = require('express');
-const router = express.Router();
-const { auth } = require('../middleware/auth');
-const {
+import express from 'express';
+import { auth } from '../middleware/auth.js';
+import {
   validateProblemTags,
   validateProblemAttempt,
   validateBookmarkProblem,
   validatePagination
-} = require('../middleware/validation');
-const {
+} from '../middleware/validation.js';
+import {
   getProblemsByTags,
   getRandomProblem,
   saveProblemAttempt,
   bookmarkProblem,
   removeBookmark,
   getBookmarks
-} = require('../controllers/codeforcesController');
+} from '../controllers/codeforcesController.js';
+
+const router = express.Router();
 
 router.get('/problems', auth, validateProblemTags, getProblemsByTags);
 router.get('/problems/random', auth, validateProblemTags, getRandomProblem);
@@ -23,4 +24,4 @@ router.post('/bookmark', auth, validateBookmarkProblem, bookmarkProblem);
 router.delete('/bookmark/:contestId/:problemIndex', auth, removeBookmark);
 router.get('/bookmarks', auth, getBookmarks);
 
-module.exports = router;
+export default router;

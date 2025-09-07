@@ -1,7 +1,6 @@
-const express = require('express');
-const router = express.Router();
-const { auth } = require('../middleware/auth');
-const {
+import express from 'express';
+import { auth } from '../middleware/auth.js';
+import {
   getUserStats,
   getSolvedProblems,
   getProblemAttempt,
@@ -9,7 +8,9 @@ const {
   getAIReview,
   getChartData,
   // updatePreferences
-} = require('../controllers/statsContoller');
+} from '../controllers/statsContoller.js';
+
+const router = express.Router();
 
 // User statistics routes
 router.get('/stats', auth, getUserStats);
@@ -38,4 +39,4 @@ router.get('/profile', auth, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

@@ -1,10 +1,11 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
 
 // Initialize the Gemini API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Code review endpoint
-exports.codeReview = async (req, res) => {
+export const codeReview = async (req, res) => {
   try {
     const { code, problemStatement, language } = req.body;
     
@@ -61,7 +62,7 @@ exports.codeReview = async (req, res) => {
 };
 
 // Code explanation endpoint
-exports.codeExplanation = async (req, res) => {
+export const codeExplanation = async (req, res) => {
   try {
     const { code } = req.body;
     

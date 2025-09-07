@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const BookmarkedProblemSchema = new mongoose.Schema({
   user: {
@@ -35,4 +35,4 @@ const BookmarkedProblemSchema = new mongoose.Schema({
 // Compound index for efficient querying
 BookmarkedProblemSchema.index({ user: 1, contestId: 1, problemIndex: 1 }, { unique: true });
 
-module.exports = mongoose.model('BookmarkedProblem', BookmarkedProblemSchema);
+export default mongoose.model('BookmarkedProblem', BookmarkedProblemSchema);

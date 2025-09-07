@@ -1,8 +1,9 @@
-const ProblemAttempt = require('../models/ProblemAttempt');
-const BookmarkedProblem = require('../models/BookmarkedProblem');
+import ProblemAttempt from '../models/ProblemAttempt.js';
+import BookmarkedProblem from '../models/BookmarkedProblem.js';
+
 
 // Get user stats
-exports.getUserStats = async (req, res) => {
+export const getUserStats = async (req, res) => {
   try {
     const userId = req.user._id;
     
@@ -72,7 +73,7 @@ exports.getUserStats = async (req, res) => {
 };
 
 // Get user's problem attempts
-exports.getUserAttempts = async (req, res) => {
+export const getUserAttempts = async (req, res) => {
   try {
     const { page = 1, limit = 20, solved } = req.query;
     const skip = (page - 1) * limit;
@@ -102,7 +103,7 @@ exports.getUserAttempts = async (req, res) => {
 };
 
 // Update user preferences
-exports.updatePreferences = async (req, res) => {
+export const updatePreferences = async (req, res) => {
   try {
     const { defaultTags, difficultyRange } = req.body;
     

@@ -1,15 +1,15 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const passport = require('passport');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import passport from 'passport';
+import 'dotenv/config.js';
 
-const connectDB = require('./src/config/database');
-const authRoutes = require('./src/routes/auth');
-const codeforcesRoutes = require('./src/routes/codeforces');
-const geminiRoutes = require('./src/routes/gemini');
-const userRoutes = require('./src/routes/users');
+import connectDB from './src/config/database.js';
+import authRoutes from './src/routes/auth.js';
+import codeforcesRoutes from './src/routes/codeforces.js';
+import geminiRoutes from './src/routes/gemini.js';
+import userRoutes from './src/routes/users.js';
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -41,7 +41,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Passport middleware
 app.use(passport.initialize());
-require('./src/config/passport')(passport);
+import passportConfig from './src/config/passport.js';
+passportConfig(passport);
 
 // Routes
 app.use('/auth', authRoutes);

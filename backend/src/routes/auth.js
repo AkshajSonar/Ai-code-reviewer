@@ -1,14 +1,15 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { auth } = require('../middleware/auth');
-const {
+
+import { auth } from '../middleware/auth.js';
+import {
   googleAuth,
   googleAuthCallback,
   googleAuthCallbackHandler,
   getCurrentUser,
   logout,
   tokenAuth // Make sure this is imported
-} = require('../controllers/authController');
+} from '../controllers/authController.js';
 
 // Add this route for Postman testing
 router.post('/token', tokenAuth);
@@ -18,4 +19,4 @@ router.get('/google/callback', googleAuthCallback, googleAuthCallbackHandler);
 router.get('/me', auth, getCurrentUser);
 router.get('/logout', auth, logout);
 
-module.exports = router;
+export default router;

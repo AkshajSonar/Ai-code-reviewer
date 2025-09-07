@@ -1,6 +1,7 @@
-const ProblemAttempt = require('../models/ProblemAttempt');
+import ProblemAttempt from '../models/ProblemAttempt.js';
 
-exports.getUserStats = async (req, res) => {
+
+export const getUserStats = async (req, res) => {
   try {
     const userId = req.user._id;
     
@@ -89,7 +90,7 @@ exports.getUserStats = async (req, res) => {
   }
 };
 
-exports.getSolvedProblems = async (req, res) => {
+export const getSolvedProblems = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
@@ -121,7 +122,7 @@ exports.getSolvedProblems = async (req, res) => {
 };
 
 // New: Get specific problem attempt with code and review
-exports.getProblemAttempt = async (req, res) => {
+export const getProblemAttempt = async (req, res) => {
   try {
     const { contestId, problemIndex } = req.params;
     
@@ -143,7 +144,7 @@ exports.getProblemAttempt = async (req, res) => {
 };
 
 // New: Get user's code for a specific problem
-exports.getUserCode = async (req, res) => {
+export const getUserCode = async (req, res) => {
   try {
     const { contestId, problemIndex } = req.params;
     const userId = req.user._id;
@@ -171,7 +172,7 @@ exports.getUserCode = async (req, res) => {
 };
 
 // New: Get AI review for a specific problem
-exports.getAIReview = async (req, res) => {
+export const getAIReview = async (req, res) => {
   try {
     const { contestId, problemIndex } = req.params;
     const userId = req.user._id;
@@ -197,7 +198,7 @@ exports.getAIReview = async (req, res) => {
 };
 
 // New: Get statistics for charts and histograms
-exports.getChartData = async (req, res) => {
+export const getChartData = async (req, res) => {
   try {
     const userId = req.user._id;
     
@@ -237,3 +238,4 @@ exports.getChartData = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+

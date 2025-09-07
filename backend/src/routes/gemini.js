@@ -1,13 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const { auth } = require('../middleware/auth');
-const { validateCodeReview } = require('../middleware/validation');
-const {
+import express from 'express';
+import { auth } from '../middleware/auth.js';
+import { validateCodeReview } from '../middleware/validation.js';
+import {
   codeReview,
   codeExplanation
-} = require('../controllers/geminiController');
+} from '../controllers/geminiController.js';
+
+const router = express.Router();
 
 router.post('/review', auth, validateCodeReview, codeReview);
 router.post('/explain', auth, validateCodeReview, codeExplanation);
 
-module.exports = router;
+export default router;

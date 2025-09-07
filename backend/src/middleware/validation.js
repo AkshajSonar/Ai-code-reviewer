@@ -1,4 +1,4 @@
-const { body, query, param, validationResult } = require('express-validator');
+import { body, query, param, validationResult } from 'express-validator';
 
 // Handle validation errors
 const handleValidationErrors = (req, res, next) => {
@@ -121,7 +121,7 @@ const validatePagination = [
   handleValidationErrors
 ];
 
-module.exports = {
+export {
   validateProblemTags,
   validateProblemAttempt,
   validateBookmarkProblem,

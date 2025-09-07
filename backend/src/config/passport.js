@@ -1,7 +1,7 @@
-const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const User = require('../models/User');
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import User from '../models/User.js';
+
 
 console.log('Passport config loading...');
 console.log('JWT Secret exists:', !!process.env.JWT_SECRET);
@@ -10,7 +10,7 @@ const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.JWT_SECRET;
 
-module.exports = (passport) => {
+const passportConfig= (passport) => {
   console.log('Initializing passport strategies...');
   
   // JWT Strategy
@@ -73,3 +73,4 @@ module.exports = (passport) => {
     }
   });
 };
+export default passportConfig;

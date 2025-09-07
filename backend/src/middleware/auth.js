@@ -1,5 +1,6 @@
-const passport = require('passport');
-const jwt = require('jsonwebtoken');
+import passport from 'passport';
+import jwt from 'jsonwebtoken';
+
 
 const auth = passport.authenticate('jwt', { session: false });
 
@@ -22,4 +23,4 @@ const optionalAuth = (req, res, next) => {
   })(req, res, next);
 };
 
-module.exports = { auth, generateToken, optionalAuth };
+export { auth, generateToken, optionalAuth };

@@ -1,9 +1,10 @@
-const passport = require('passport');
-const User = require('../models/User');
-const { generateToken } = require('../middleware/auth');
+import passport from 'passport';
+import User from '../models/User.js';
+import { generateToken } from '../middleware/auth.js';
+
 
 // Simple token-based auth endpoint for Postman testing
-exports.tokenAuth = async (req, res) => {
+export const tokenAuth = async (req, res) => {
   try {
     const { token } = req.body;
     
@@ -52,17 +53,17 @@ exports.tokenAuth = async (req, res) => {
 };
 
 // Google OAuth authentication
-exports.googleAuth = passport.authenticate('google', {
+export const googleAuth = passport.authenticate('google', {
   scope: ['profile', 'email']
 });
 
 // Google OAuth callback
-exports.googleAuthCallback = passport.authenticate('google', {
+export const googleAuthCallback = passport.authenticate('google', {
   failureRedirect: process.env.FRONTEND_LOGIN_URL || '/login',
   session: false
 });
 
-exports.googleAuthCallbackHandler = (req, res) => {
+export const googleAuthCallbackHandler = (req, res) => {
   // Generate JWT token
   const token = generateToken(req.user);
   
@@ -72,7 +73,7 @@ exports.googleAuthCallbackHandler = (req, res) => {
 };
 
 // Get current user
-exports.getCurrentUser = async (req, res) => {
+export const getCurrentUser = async (req, res) => {
   try {
     res.json({
       user: {
@@ -90,7 +91,7 @@ exports.getCurrentUser = async (req, res) => {
 };
 
 // Logout
-exports.logout = (req, res) => {
+export const logout = (req, res) => {
   // In a real application, you might want to blacklist the token
   res.json({ message: 'Logged out successfully' });
 };

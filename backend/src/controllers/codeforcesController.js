@@ -1,9 +1,10 @@
-const axios = require('axios');
-const ProblemAttempt = require('../models/ProblemAttempt');
-const BookmarkedProblem = require('../models/BookmarkedProblem');
+import axios from 'axios';
+import ProblemAttempt from '../models/ProblemAttempt.js';
+import BookmarkedProblem from '../models/BookmarkedProblem.js';
+
 
 // Get problems by tags from Codeforces
-exports.getProblemsByTags = async (req, res) => {
+export const getProblemsByTags = async (req, res) => {
   try {
     const { tags } = req.query;
     
@@ -33,7 +34,7 @@ exports.getProblemsByTags = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
-exports.saveProblemAttempt = async (req, res) => {
+export const saveProblemAttempt = async (req, res) => {
   try {
     const {
       contestId,
@@ -105,7 +106,7 @@ exports.saveProblemAttempt = async (req, res) => {
 };
 
 // Bookmark a problem
-exports.bookmarkProblem = async (req, res) => {
+export const bookmarkProblem = async (req, res) => {
   try {
     const { contestId, problemIndex, problemName, problemTags, problemRating } = req.body;
     
@@ -149,7 +150,7 @@ exports.bookmarkProblem = async (req, res) => {
 };
 
 // Remove bookmark
-exports.removeBookmark = async (req, res) => {
+export const removeBookmark = async (req, res) => {
   try {
     const { contestId, problemIndex } = req.params;
     
@@ -171,7 +172,7 @@ exports.removeBookmark = async (req, res) => {
 };
 
 // Get user's bookmarked problems
-exports.getBookmarks = async (req, res) => {
+export const getBookmarks = async (req, res) => {
   try {
     const bookmarks = await BookmarkedProblem.find({ user: req.user._id }).sort({ bookmarkedAt: -1 });
     res.json({ bookmarks });
@@ -182,7 +183,7 @@ exports.getBookmarks = async (req, res) => {
 };
 
 
-exports.getRandomProblem = async (req, res) => {
+export const getRandomProblem = async (req, res) => {
   try {
     const { tags, rating } = req.query;
     
