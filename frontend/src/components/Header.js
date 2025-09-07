@@ -7,6 +7,10 @@ const Header = ({ user, onLogout }) => {
     onLogout();
   };
 
+  const handleAvatarError = (e) => {
+    e.target.style.display = 'none';
+  };
+
   return (
     <header className="header">
       <div className="header-content">
@@ -22,11 +26,14 @@ const Header = ({ user, onLogout }) => {
               <a href="/solve" className="nav-link">Solve Problems</a>
               <a href="/profile" className="nav-link">Profile</a>
               <div className="user-menu">
-                <img 
-                  src={user.avatar || '/default-avatar.png'} 
-                  alt={user.name}
-                  className="user-avatar"
-                />
+                {user.avatar && (
+                  <img 
+                    src={user.avatar} 
+                    alt={user.name}
+                    className="user-avatar"
+                    onError={handleAvatarError}
+                  />
+                )}
                 <span className="user-name">{user.name}</span>
                 <button onClick={handleLogout} className="btn btn-secondary">
                   Logout

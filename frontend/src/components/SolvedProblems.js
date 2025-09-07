@@ -112,15 +112,15 @@ const SolvedProblems = () => {
                   >
                     View Problem
                   </a>
-                  <button
+                  {/* <button
                     onClick={() => viewCode(problem)}
                     className="btn btn-primary"
                   >
                     View My Code
-                  </button>
+                  </button> */}
                   <button
                     onClick={() => viewReview(problem)}
-                    className="btn btn-secondary"
+                    className="btn btn-primary"
                     disabled={!problem.reviewFeedback}
                   >
                     View AI Review
@@ -154,7 +154,7 @@ const SolvedProblems = () => {
             </div>
           )}
 
-          {/* Code Modal */}
+          {/* /* Code Modal
           {showCode && selectedProblem && (
             <div className="modal-overlay" onClick={closeModal}>
               <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -170,7 +170,7 @@ const SolvedProblems = () => {
                 </div>
               </div>
             </div>
-          )}
+          )} */ }
 
           {/* Review Modal */}
           {showReview && selectedProblem && (

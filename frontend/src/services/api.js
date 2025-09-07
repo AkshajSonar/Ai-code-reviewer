@@ -58,6 +58,7 @@ export const userAPI = {
   getAIReview: (contestId, problemIndex) => api.get(`/api/users/review/${contestId}/${problemIndex}`),
   getChartData: () => api.get('/api/users/chart-data'),
   updatePreferences: (data) => api.put('/api/users/preferences', data),
+  getProfile: () => api.get('/api/users/profile'), 
 };
 
 export default api;

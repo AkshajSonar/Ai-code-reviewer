@@ -146,12 +146,13 @@ exports.getProblemAttempt = async (req, res) => {
 exports.getUserCode = async (req, res) => {
   try {
     const { contestId, problemIndex } = req.params;
+    const userId = req.user._id;
     
     const attempt = await ProblemAttempt.findOne({
-      user: req.user._id,
+      user: userId,
       contestId,
       problemIndex
-    }).select('code language problemName');
+    }).select('code language attemptDate solved');
     
     if (!attempt) {
       return res.status(404).json({ error: 'Code not found' });
@@ -160,7 +161,8 @@ exports.getUserCode = async (req, res) => {
     res.json({ 
       code: attempt.code,
       language: attempt.language,
-      problemName: attempt.problemName
+      attemptDate: attempt.attemptDate,
+      solved: attempt.solved
     });
   } catch (error) {
     console.error('Error fetching user code:', error);
@@ -172,26 +174,21 @@ exports.getUserCode = async (req, res) => {
 exports.getAIReview = async (req, res) => {
   try {
     const { contestId, problemIndex } = req.params;
+    const userId = req.user._id;
     
     const attempt = await ProblemAttempt.findOne({
-      user: req.user._id,
+      user: userId,
       contestId,
       problemIndex
-    }).select('reviewFeedback problemName timeTaken problemRating');
+    }).select('reviewFeedback attemptDate');
     
     if (!attempt) {
       return res.status(404).json({ error: 'Review not found' });
     }
     
-    if (!attempt.reviewFeedback) {
-      return res.status(404).json({ error: 'No AI review available for this problem' });
-    }
-    
     res.json({ 
       review: attempt.reviewFeedback,
-      problemName: attempt.problemName,
-      timeTaken: attempt.timeTaken,
-      problemRating: attempt.problemRating
+      attemptDate: attempt.attemptDate
     });
   } catch (error) {
     console.error('Error fetching AI review:', error);

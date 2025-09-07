@@ -3,17 +3,20 @@ import { codeforcesAPI, userAPI } from '../services/api';
 import Statistics from '../components/Statistics';
 import BookmarkManager from '../components/BookmarkManager';
 import SolvedProblems from '../components/SolvedProblems';
+import Profile from '../components/Profile';
 
 const Dashboard = () => {
   const [tags, setTags] = useState(['greedy', 'math']);
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(false);
   const [userStats, setUserStats] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [activeTab, setActiveTab] = useState('problems');
   const [selectedRating, setSelectedRating] = useState(1500);
 
   useEffect(() => {
     fetchUserStats();
+    fetchUserProfile();
   }, []);
 
   const fetchUserStats = async () => {
@@ -22,6 +25,18 @@ const Dashboard = () => {
       setUserStats(response.data);
     } catch (error) {
       console.error('Failed to fetch stats:', error);
+      setUserStats({ 
+        error: error.response?.data?.error || 'Failed to load statistics' 
+      });
+    }
+  };
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await userAPI.getProfile();
+      setUserProfile(response.data.user);
+    } catch (error) {
+      console.error('Failed to fetch profile:', error);
     }
   };
 
@@ -34,7 +49,7 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const response = await codeforcesAPI.getRandomProblem(
-        tags.join(','),
+        tags.join(';'),
         selectedRating
       );
       
@@ -67,21 +82,23 @@ const Dashboard = () => {
         <p>Select tags and get a random coding problem to solve</p>
       </div>
 
-      {/* Rating Filter - Moved to top */}
-      <div className="rating-filter">
-        <h4>Filter by Rating:</h4>
-        <div className="rating-slider">
-          <input
-            type="range"
-            min="800"
-            max="3500"
-            step="100"
-            value={selectedRating}
-            onChange={(e) => setSelectedRating(parseInt(e.target.value))}
-          />
-          <span className="rating-value">{selectedRating}</span>
+      {/* Rating Filter - Only show in Problems tab */}
+      {activeTab === 'problems' && (
+        <div className="rating-filter">
+          <h4>Filter by Rating:</h4>
+          <div className="rating-slider">
+            <input
+              type="range"
+              min="800"
+              max="3500"
+              step="100"
+              value={selectedRating}
+              onChange={(e) => setSelectedRating(parseInt(e.target.value))}
+            />
+            <span className="rating-value">{selectedRating}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="dashboard-tabs">
         <button 
@@ -107,6 +124,12 @@ const Dashboard = () => {
           onClick={() => setActiveTab('bookmarks')}
         >
           Bookmarks
+        </button>
+        <button 
+          className={activeTab === 'profile' ? 'active' : ''}
+          onClick={() => setActiveTab('profile')}
+        >
+          Profile
         </button>
       </div>
 
@@ -148,7 +171,7 @@ const Dashboard = () => {
                     ))}
                   </div>
                   <a 
-                    href={problem.url} 
+                    href={`https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}`}
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="btn btn-secondary"
@@ -156,7 +179,7 @@ const Dashboard = () => {
                     View on Codeforces
                   </a>
                   <a 
-                    href={`/solve?problem=${encodeURIComponent(problem.name)}&contestId=${problem.contestId}&index=${problem.index}&rating=${problem.rating || 1500}&tags=${problem.tags?.join(',') || ''}`}
+                    href={`/solve?contestId=${problem.contestId}&index=${problem.index}&name=${encodeURIComponent(problem.name)}&rating=${problem.rating || 1500}`}
                     className="btn btn-primary"
                   >
                     Solve This Problem
@@ -171,16 +194,30 @@ const Dashboard = () => {
           <SolvedProblems />
         )}
 
-        {activeTab === 'stats' && userStats && (
-          <Statistics 
-            stats={userStats.stats}
-            byTag={userStats.byTag}
-            byRating={userStats.byRating}
-          />
+        {activeTab === 'stats' && (
+          <div className="stats-tab">
+            {!userStats ? (
+              <div>Loading statistics...</div>
+            ) : userStats.error ? (
+              <div className="error-message">
+                Failed to load statistics: {userStats.error}
+              </div>
+            ) : (
+              <Statistics 
+                stats={userStats.stats}
+                byTag={userStats.byTag}
+                byRating={userStats.byRating}
+              />
+            )}
+          </div>
         )}
 
         {activeTab === 'bookmarks' && (
           <BookmarkManager />
+        )}
+
+        {activeTab === 'profile' && userProfile && (
+          <Profile user={userProfile} />
         )}
       </div>
     </div>
