@@ -30,7 +30,7 @@ const Login = ({ onLogin }) => {
           <div className="divider">OR</div>
           
           <button 
-            onClick={() => window.location.href = 'http://localhost:5001/auth/google'}
+            onClick={() => window.location.href = `${process.env.REACT_APP_API_URL}/auth/google`}
             className="btn btn-google"
           >
             Sign In with Google

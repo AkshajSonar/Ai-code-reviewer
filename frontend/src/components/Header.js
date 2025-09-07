@@ -23,8 +23,8 @@ const Header = ({ user, onLogout }) => {
           {user ? (
             <>
               <a href="/" className="nav-link">Dashboard</a>
-              <a href="/solve" className="nav-link">Solve Problems</a>
-              <a href="/profile" className="nav-link">Profile</a>
+              {/* <a href="/solve" className="nav-link">Solve Problems</a>
+              <a href="/profile" className="nav-link">Profile</a> */}
               <div className="user-menu">
                 {user.avatar && (
                   <img 
